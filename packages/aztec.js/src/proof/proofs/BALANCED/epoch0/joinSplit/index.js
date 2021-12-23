@@ -155,6 +155,15 @@ class JoinSplitProof65793 extends Proof {
             this.sender,
         );
     }
+    constructSignaturesMetamask(verifyingContract, signTypedData) {
+        return signer.signMultipleNotesForConfidentialTransferMetamask(
+            verifyingContract,
+            signTypedData,
+            this.inputNotes,
+            this.challengeHex,
+            this.sender,
+        );
+    }
 
     /**
      * Encode the join-split proof as data for an Ethereum transaction
