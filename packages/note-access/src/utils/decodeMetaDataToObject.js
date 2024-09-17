@@ -21,7 +21,6 @@ export default function decodeMetaDataToObject(metaDataStr, config, startOffset 
         const dynamicVars = formattedMetaDataStr.substr(startOfVars, MIN_BYTES_VAR_LENGTH);
         offsetOfDynamicDataMapping.push(2 * parseInt(dynamicVars, 16) - startOffset);
     });
-
     const metaDataObj = {};
     config.forEach(({ name, length, _toString }, i) => {
         const data = [];
@@ -37,7 +36,6 @@ export default function decodeMetaDataToObject(metaDataStr, config, startOffset 
                 : endOfDynamicData - startOfDynamicData - MIN_BYTES_VAR_LENGTH;
 
         const numberOfDynamicData = parseInt(dataStr.slice(0, MIN_BYTES_VAR_LENGTH), 10);
-
         for (let j = 0; j < numberOfDynamicData; j += 1) {
             const dynamicData = dataStr.substr(lengthOfDynamicData * j + MIN_BYTES_VAR_LENGTH, lengthOfDynamicData);
             let formattedData = length !== undefined ? dynamicData.slice(-length) : stripPrependedZeroes(dynamicData);
@@ -45,10 +43,9 @@ export default function decodeMetaDataToObject(metaDataStr, config, startOffset 
                 formattedData = _toString(formattedData).replace(/^0x/, '');
             }
             data.push(`0x${formattedData}`);
-        }
+        } 
         const isArrayData = length !== undefined;
         metaDataObj[name] = isArrayData ? data : data[0] || '';
-    });
-
+    });    
     return metaDataObj;
 }

@@ -189,6 +189,20 @@ signer.signMultipleNotesForConfidentialTransfer = (verifyingContract, noteOwnerA
     return `0x${unformattedSignature.join('')}`;
 };
 
+signer.signMultipleNotesForConfidentialTransferMetamask = async (verifyingContract, signTypedData,notes, challenge, sender) => {
+    const unformattedSignature = await Promise.all(notes.map(async (note) => {
+        return await signer.signNoteForConfidentialTransferMetamask(
+            verifyingContract,
+            signTypedData,
+            note.noteHash,
+            challenge,
+            sender,
+        );
+    }));
+
+    return `0x${unformattedSignature.join('')}`;
+};
+
 /**
  * Create an EIP712 ECDSA signature over an AZTEC note, to be used to give permission for
  * note expenditure during a zkAsset confidentialTransfer() method call.
@@ -218,6 +232,27 @@ signer.signNoteForConfidentialTransfer = (verifyingContract, noteOwnerAccount, n
     const { unformattedSignature } = signer.signTypedData(domain, schema, message, privateKey);
 
     return `${unformattedSignature.slice(0, 130)}`;
+};
+
+signer.signNoteForConfidentialTransferMetamask = async (verifyingContract, signTypedData, noteHash, challenge, sender) => {
+    const domain = signer.generateZKAssetDomainParams(verifyingContract);
+    const schema = constants.eip712.JOIN_SPLIT_SIGNATURE;
+    const message = {
+        proof: proofs.JOIN_SPLIT_PROOF,
+        noteHash,
+        challenge,
+        sender,
+    };
+
+    const msg = {
+        domain,
+        ...schema,
+        message,
+    };
+
+    let result = await signTypedData(msg);
+    result = result.substring(2);
+    return `${result.slice(0, 130)}`;
 };
 
 /**
